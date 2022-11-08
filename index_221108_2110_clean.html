@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>myToDoList</title>
+<script src="js/jquery-2.1.3.min.js"></script>
+<link rel="stylesheet" href="css/sample.css">
+</head>
+<body>
+<header>
+<h1>My To Do List</h1>
+</header>
+<main>
+    <!-- <input type="text" id="key"> -->
+    <select id="kougi" name="kougi" required>
+        <option value="kougi">講義を選択</option>
+        <option value="0（HTML･CSS-チーズアカデミー）">0（HTML･CSS-チーズアカデミー）</option>
+        <option value="1（JS1-じゃんけんアプリ">1（JS1-じゃんけんアプリ）</option>
+        <option value="2（Github演習-じゃんけんアプリ リッチVer.）">2（Github演習-じゃんけんアプリ リッチVer.）</option>
+        <option value="3（JS2-メモ帳アプリ）">3（JS2-メモ帳アプリ）</option>
+        <option value="4（JS3-チャットアプリ）">4（JS3-チャットアプリ）</option>
+        <option value="5（JS4-APIアプリ）">5（JS4-APIアプリ）</option>
+        <option value="6（PHP1-環境構築､基礎文法）">6（PHP1-環境構築､基礎文法）</option>
+        <option value="7（PHP2-ブックマークアプリ[登録]）">7（PHP2-ブックマークアプリ[登録]）</option>
+        <option value="8（PHP3-ブックマークアプリ[更新 削除]）">8（PHP3-ブックマークアプリ[更新 削除]）</option>
+        <option value="9（PHP4-ブックマークアプリ[ユーザー管理]）">9（PHP4-ブックマークアプリ[ユーザー管理]）</option>
+        <option value="10（PHP5-CRUDを用いたアプリ[なんでも自由]）">10（PHP5-CRUDを用いたアプリ[なんでも自由]）</option>
+        <option value="11（Laravel1）[任意]">11（Laravel1）[任意]</option>
+        <option value="12（Laravel2）[任意]">12（Laravel2）[任意]</option>
+    </select>
+    <select id="genre" name="genre" required>
+        <option value="">ジャンルを選択</option>
+        <option value="Tips">Tips</option>
+        <option value="気付き">気付き</option>
+        <option value="参考情報">参考情報</option>
+    </select>
+    <!-- <div id="number"></div>
+    <div id="date"></div> -->
+    <textarea id="memo"></textarea>
+    <ul>
+        <li id="save">保存</li>
+        <li id="clear">全削除</li>
+        <li id="clear2">選択削除</li>
+    </ul>
+</main>
+<table id="list">
+<!-- ここに追加データが挿入される -->
+</table>
+<!-- <div id="list"> -->
+<!-- ここに追加データが挿入される -->
+<!-- </div> -->
+
+<script>
+
+//div要素id属性mainを指定
+
+let  orderedNumber =1;
+
+const contents=[];
+
+// 1.Save クリックイベント
+
+$("#save").on("click",function(){
+
+    //曜日配列
+    let eMonth = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    let week   = ["日", "月", "火", "水", "木", "金", "土"];
+
+
+    //日時取得
+    let now = new Date();            //日付取得準備（必須）！！
+    let year = now.getFullYear();    //年
+    let month = now.getMonth() + 1;  //月+１を足す
+    let date = now.getDate();        //日
+    let day = now.getDay();          //曜日（数値）
+    let h = now.getHours();          //時
+    let m = now.getMinutes();        //分
+    let s = now.getSeconds();        //秒
+
+    //日時表示文字列の作成
+    let str = year + "-" + month + "-" + date + "(" + week[day] + ") " + h + ":" + m + ":" + s;
+
+    // 1)クリックした内容を変数に保存
+
+    let kougi =$("#kougi").val();
+    let genre =$("#genre").val();
+    let memo =$("#memo").val();
+
+    // 2) 221106_1606 JSONのためのOBJ追加
+
+    const o1 ={
+        num:orderedNumber,
+        when:str,
+        kougi:kougi,
+        genres:genre,
+        memos:memo
+    }
+    const json =JSON.stringify(o1);
+    localStorage.setItem("TDL"+orderedNumber,json);
+    const val = localStorage.getItem("TDL");
+    const tdl = JSON.parse(val);
+    console.log(tdl);
+
+    // 3)HTML用に、コンテンツをtableに追加してlistにappend
+    
+    const contents =`
+        <table class="remove">
+            <tbody> 
+                <tr class="remove">
+                    <th id="left1" class="delete"><input type="checkbox" id="check${orderedNumber}" name="scales"></th>
+                    <th id="left2" class="delete">TDL${orderedNumber}</th>
+                    <td class="center delete">${str}</td>
+                    <td class="center delete">${kougi}</td>
+                    <td class="right1 delete">${genre}</td>
+                    <td class="right2 delete">${memo}</td>
+                </tr>
+            </tbody)
+        </table>  
+    `;
+    
+    $("#list").append(contents);
+    console.log(contents);
+    // console.log(contents);
+
+    // 5)orderedNumber++
+    orderedNumber++;
+})
+// ---------------------------------------------------------
+
+// ---------------------------------------------------------
+
+
+//2.clear クリックイベント
+$("#clear").on("click",function(){
+    alert("本当に消して大丈夫ですか？")
+
+    localStorage.clear("TDL"+orderedNumber);
+    // emptyというのはJQUERYの決まり事。
+    $("#list").empty();
+})
+
+
+//2.clear クリックイベントの1行削除（宿題）
+// 221108_2052　まえたつさんのアドバイス後
+
+$("#clear2").on('click', function() {
+    // 221107_2354+ for loopは断念。。。
+    for (let i = 0; i < 10; i++) {
+        
+        if ($("#check"+i).is(":checked")) {
+            console.log(true);
+            $("#check"+i).closest(".remove").remove();
+            localStorage.removeItem("TDL"+i);
+             } else {
+            console.log(false);
+          }
+    };
+});
+    
+//3.ページ読み込み：保存データ取得表示
+
+// for (let i=0;i<localStorage.length;i++){
+//     const key=localStorage.key(i);
+//     const value =localStorage.getItem(key);
+//     const html=`
+//     <tr>
+//         <th>${key}</th>
+//         <td>${value}</td>
+//     </tr>  
+// `
+// $("#list").append(html);
+
+// リロードのおまじない
+// location.reload()
+
+// }
+
+
+
+</script>
+<footer><small>G'sでの苦闘メモ</small></footer>
+</body>
+</html>
